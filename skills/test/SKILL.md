@@ -1,0 +1,29 @@
+---
+name: test
+description: Verifies a completed build against the spec's acceptance criteria. Only runs when the user explicitly types /test.
+disable-model-invocation: true
+---
+
+# Test
+
+## Overview
+
+Check the implementation against `spec.md`'s acceptance criteria, one by one, with real evidence — not a plausibility argument. This is behavioral verification, not code review: `/review` follows this step for a final spec-conformance pass, and your existing code-review/security-review tooling covers code quality separately.
+
+## When to Use
+
+Explicit invocation only (`/test`). Requires `specs/<slug>/spec.md` (for acceptance criteria) and a `specs/<slug>/tasks.md` with all tasks checked off.
+
+## Process
+
+1. Find `specs/<slug>/spec.md` and `specs/<slug>/tasks.md`. If tasks aren't all checked off, stop and tell the user to finish `/build` first.
+2. For each acceptance criterion in the spec, actually exercise it: run the test suite, run the feature, hit the endpoint, check the UI in a browser — whatever proves the behavior, not just reading the code.
+3. Append a **Verification** section to `specs/<slug>/tasks.md` listing each acceptance criterion with a pass/fail and the evidence (test name, command output, screenshot description).
+4. If something fails, don't paper over it — report it and tell the user to go back to `/build` (or `/plan` if the gap is a planning issue).
+5. If everything passes, tell the user: "All acceptance criteria verified. Run `/review` for a final spec-conformance pass."
+
+## Red Flags
+
+- Marking a criterion as passing because the code "looks right" without running anything.
+- Testing implementation details instead of the acceptance criteria as written in the spec.
+- Quietly weakening an acceptance criterion to make it pass — flag the mismatch to the user instead.
