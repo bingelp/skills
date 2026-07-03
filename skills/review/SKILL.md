@@ -2,6 +2,7 @@
 name: review
 description: Final spec-conformance review comparing the implementation against specs/<slug>/spec.md and plan.md. Only runs when the user explicitly types /review.
 disable-model-invocation: true
+model: opus
 ---
 
 # Review

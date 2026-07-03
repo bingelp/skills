@@ -2,6 +2,7 @@
 name: build
 description: Implements tasks from an approved plan, one at a time. Only runs when the user explicitly types /build.
 disable-model-invocation: true
+model: sonnet
 ---
 
 # Build

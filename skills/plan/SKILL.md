@@ -2,6 +2,7 @@
 name: plan
 description: Turns an approved spec into a technical plan and task breakdown. Only runs when the user explicitly types /plan.
 disable-model-invocation: true
+model: opus
 ---
 
 # Plan
@@ -20,7 +21,7 @@ Explicit invocation only (`/plan`). Requires an existing `specs/<slug>/spec.md`.
 
 1. Find `specs/<slug>/spec.md`. If no slug is obvious from context, ask which feature this is for. If `spec.md` doesn't exist, stop and tell the user to run `/spec` first. Read `CONTEXT.md` (or `CONTEXT-MAP.md`) if it exists so the plan's vocabulary matches the project's.
 2. Read the spec's requirements and acceptance criteria. Explore the codebase for existing utilities, patterns, and files this will touch — reuse over rewriting.
-3. For any architectural fork (more than one reasonable way to build this), interview the user about it one decision at a time using the `grilling` skill rather than silently picking one.
+3. For any architectural fork (more than one reasonable way to build this), interview the user about it one decision at a time using the `grilling` skill rather than silently picking one. For UI-bearing features this includes visual style — theme, color palette, typography — if `spec.md` didn't already pin it down: don't silently reach for a stock framework theme (e.g. default Material 3) just because it's the path of least resistance, especially when reference screenshots exist that were never actually asked about beyond layout.
 4. Write `specs/<slug>/plan.md`:
    - **Approach** — the technical strategy, in plain language
    - **Files/modules touched** — with brief reasoning
@@ -34,4 +35,5 @@ Explicit invocation only (`/plan`). Requires an existing `specs/<slug>/spec.md`.
 - Skipping straight to task-writing without an Approach section — the plan needs a narrative, not just a checklist.
 - Tasks that bundle multiple unrelated changes — split them.
 - Introducing a new dependency or pattern not justified by the spec — flag it as a decision, don't silently do it.
+- Defaulting to a stock theme/style for a UI-bearing feature without confirming it with the user, particularly when reference screenshots or mockups exist and weren't asked about beyond layout.
 - Making a hard-to-reverse architectural call without offering an ADR, or writing an ADR for something trivial or easily reversed — see `domain-modeling`'s three-part test.
