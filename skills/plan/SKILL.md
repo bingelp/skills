@@ -28,7 +28,8 @@ Explicit invocation only (`/plan`). Requires an existing `specs/<slug>/spec.md`.
    - **Key decisions & trade-offs** — anything non-obvious, alternatives you rejected and why
 5. For each key decision, apply the `domain-modeling` skill's ADR test (hard to reverse + surprising without context + real trade-off). If all three hold, record it as an ADR rather than only noting it in `plan.md` — `plan.md` is feature-scoped and disposable, ADRs are permanent project memory.
 6. Write `specs/<slug>/tasks.md` as a checklist of atomic, independently-verifiable tasks (thin vertical slices, not "write all the models" then "write all the views"). Each task should be small enough to implement and verify in one sitting.
-7. Show the user both files (and any new ADRs). Stop. Tell them: "Review this, and run `/build` once you're happy with it."
+7. If you're revising an existing `plan.md` (rather than writing it the first time), reconcile downstream per [where/RECONCILE.md](../where/RECONCILE.md): a changed approach or key decision means the `tasks.md` derived from it, and any build already done against the old approach, may no longer be valid — update tasks and flag already-built work that needs revisiting. And if the reason you're re-planning is that the *spec* changed, reconcile from there first — don't patch the plan around a spec you haven't caught up to.
+8. Show the user both files (and any new ADRs). Stop. Tell them: "Review this, and run `/build` once you're happy with it."
 
 ## Red Flags
 
@@ -37,3 +38,4 @@ Explicit invocation only (`/plan`). Requires an existing `specs/<slug>/spec.md`.
 - Introducing a new dependency or pattern not justified by the spec — flag it as a decision, don't silently do it.
 - Defaulting to a stock theme/style for a UI-bearing feature without confirming it with the user, particularly when reference screenshots or mockups exist and weren't asked about beyond layout.
 - Making a hard-to-reverse architectural call without offering an ADR, or writing an ADR for something trivial or easily reversed — see `domain-modeling`'s three-part test.
+- Revising `plan.md` without reconciling the `tasks.md` and already-built work derived from the old approach — see `where/RECONCILE.md`.

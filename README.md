@@ -57,6 +57,25 @@ hands off to `/code-review` and `/security-review` for the code-quality/security
 deliberately delegates. It confirms before any outward-facing step (push, PR) and never merges. Unlike
 the other phases it writes no `specs/<slug>/` artifact; its output is the branch, commits, and PR.
 
+## Looping back
+
+The pipeline flows forward but isn't one-way. Real work loops back — `/test` fails and you re-`/build`,
+or you realise mid-build that the spec was wrong. The catch is that the artifacts form a dependency
+chain (`spec → plan → tasks → verification → review`), so **changing anything upstream silently
+invalidates everything downstream of it**. Left unmanaged, that drift is invisible until it bites.
+
+The fix is a reconciliation discipline rather than a rule against looping back:
+
+- Each phase skill, when it changes an artifact that already has downstream artifacts, reconciles them
+  in the same pass — re-run the affected phase, edit-and-revalidate, or explicitly confirm still-valid.
+  The protocol (which change invalidates what) lives in
+  [`skills/where/RECONCILE.md`](skills/where/RECONCILE.md).
+- `/where` is the backstop: it detects drift (an `AC<n>` with no verification entry, an upstream file
+  changed after a downstream one) and surfaces it as a ⚠ line, so drift that slipped past a hand-edit
+  gets caught the next time you check state.
+- Stable `AC<n>` IDs make spec↔test drift content-detectable. The known blind spot is a *reworded* AC
+  (same ID and count) — so the discipline is to re-run `/test` after any change to an AC's meaning.
+
 ## Ubiquitous language & ADRs
 
 `domain-modeling` maintains two project-level (not per-feature) files, ported from mattpocock's skills:

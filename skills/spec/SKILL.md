@@ -43,7 +43,8 @@ Explicit invocation only (`/spec`). Typical trigger: the user wants to start a n
 8. Pick a kebab-case slug for the feature. Create `specs/<slug>/spec.md` using [SPEC-TEMPLATE.md](SPEC-TEMPLATE.md).
 
    Do not add a "Domain Vocabulary" (or similarly-named) section to `spec.md` — canonical term definitions live in `CONTEXT.md` (via step 2), not here. `spec.md` should just use the established terms; if a definition would help a reader, reference `CONTEXT.md` rather than restating it.
-9. Show the user the spec (and any new/updated `CONTEXT.md`). Stop. Tell them: "Review this, and run `/plan` once you're happy with it."
+9. If this feature already has downstream artifacts (`plan.md`, `tasks.md`, `review.md`) — i.e. you're revising a spec mid-pipeline, not writing a fresh one — reconcile them per [where/RECONCILE.md](../where/RECONCILE.md) before handing back. An added/removed/reworded requirement or `AC<n>` invalidates the plan, tasks, and any verification derived from the old spec; don't leave them silently stale. Tell the user which downstream artifacts your change touched and what needs re-running.
+10. Show the user the spec (and any new/updated `CONTEXT.md`). Stop. Tell them: "Review this, and run `/plan` once you're happy with it."
 
 ## Red Flags
 
@@ -55,4 +56,5 @@ Explicit invocation only (`/spec`). Typical trigger: the user wants to start a n
 - Acceptance criteria that are vague ("works well", "is fast") — make them checkable.
 - Writing acceptance criteria without stable `AC<n>` IDs, or renumbering existing ones when editing the spec — downstream `/test` and `/review` cite these IDs; renumbering silently breaks traceability. Append new IDs, never reuse or shift old ones.
 - Proceeding to `/plan` yourself instead of stopping for approval.
+- Revising an existing `spec.md` without reconciling the plan, tasks, and review that were derived from the old one — that silent drift is exactly the loop-back failure `where/RECONCILE.md` exists to prevent.
 - Silently assuming a visual style (a default framework theme, or "matching the reference" without confirming how much of the reference) for a UI-bearing feature instead of asking.
