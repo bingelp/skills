@@ -1,11 +1,27 @@
 ---
 name: prototype
-description: Build a throwaway prototype to answer a design question. Use when the user wants to sanity-check whether a state model or logic feels right, or explore what a UI should look like.
+description: Build a throwaway prototype to answer a design question. Use when the user asks to spike, prototype, run a PoC, de-risk an idea, sanity-check a state model, compare options, or explore UI directions before committing to implementation.
 ---
 
 # Prototype
 
 A prototype is **throwaway code that answers a question**. The question decides the shape.
+
+## Trigger signals
+
+Reach for this skill when the user says things like:
+
+- "Let's spike this"
+- "Can we do a quick PoC?"
+- "I am not sure this model works"
+- "Show me a few UI directions"
+- "Let's test this idea before we commit"
+
+Also trigger when there are multiple plausible approaches and confidence is low, even if the user does not explicitly say "prototype".
+
+## Do not trigger
+
+Do not trigger when requirements are clear, implementation is straightforward, and the user is asking for direct production changes.
 
 ## Pick a branch
 

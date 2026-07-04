@@ -3,13 +3,22 @@
 A personal Claude Code skills library built around one deliberate, gated workflow:
 
 ```
-/spec  →  /plan  →  /build  →  /test  →  /review
+/spec  →  /plan  →  /build  →  /test  →  /review  →  /ship
 ```
+
+When uncertainty is high, use a prototype pass first:
+
+```
+/prototype  →  /spec  →  /plan  →  /build  →  /test  →  /review  →  /ship
+```
+
+Use this path when the question is still ambiguous after interview (for example, uncertain state model behavior, unclear interaction design, or multiple plausible approaches with low confidence).
 
 Each phase is a skill in `skills/<name>/SKILL.md`. Unlike command-driven setups, invocation is
 controlled entirely through skill frontmatter:
 
-- The 5 pipeline skills (`spec`, `plan`, `build`, `test`, `review`) set `disable-model-invocation: true`,
+- The pipeline skills (`spec`, `plan`, `build`, `test`, `review`, `ship`, plus the `where` status
+  check) set `disable-model-invocation: true`,
   so they only run when explicitly invoked (typing `/spec`, `/plan`, etc.) — never auto-triggered by
   Claude matching their description against the conversation.
 - Standalone skills like `tdd` omit that flag, so they trigger automatically from context (e.g. Claude
@@ -34,8 +43,38 @@ specs/<slug>/
 If a phase's required input file is missing, it tells you which command to run first instead of
 improvising.
 
+`/where` is a read-only status check across a feature's `specs/<slug>/` artifacts — it reports which
+gate you're at (`spec ✓ plan ✓ build 3/7 test — review —`) and the single command to run next.
+Useful when returning to a feature after a break, since the pipeline is stateful but otherwise has no
+way to query the current state.
+
 `/review` is a **spec-conformance** check (did we build what `/spec` said), not a code-quality or
 security review — pair it with your existing code-review/security-review tooling for that.
+
+`/ship` is the operational close: once `/review` passes, it turns the work into git state — a feature
+branch, atomic commits mapped to the tasks, and a draft PR built from `spec.md` + `review.md` — then
+hands off to `/code-review` and `/security-review` for the code-quality/security gates this pipeline
+deliberately delegates. It confirms before any outward-facing step (push, PR) and never merges. Unlike
+the other phases it writes no `specs/<slug>/` artifact; its output is the branch, commits, and PR.
+
+## Looping back
+
+The pipeline flows forward but isn't one-way. Real work loops back — `/test` fails and you re-`/build`,
+or you realise mid-build that the spec was wrong. The catch is that the artifacts form a dependency
+chain (`spec → plan → tasks → verification → review`), so **changing anything upstream silently
+invalidates everything downstream of it**. Left unmanaged, that drift is invisible until it bites.
+
+The fix is a reconciliation discipline rather than a rule against looping back:
+
+- Each phase skill, when it changes an artifact that already has downstream artifacts, reconciles them
+  in the same pass — re-run the affected phase, edit-and-revalidate, or explicitly confirm still-valid.
+  The protocol (which change invalidates what) lives in
+  [`skills/where/RECONCILE.md`](skills/where/RECONCILE.md).
+- `/where` is the backstop: it detects drift (an `AC<n>` with no verification entry, an upstream file
+  changed after a downstream one) and surfaces it as a ⚠ line, so drift that slipped past a hand-edit
+  gets caught the next time you check state.
+- Stable `AC<n>` IDs make spec↔test drift content-detectable. The known blind spot is a *reworded* AC
+  (same ID and count) — so the discipline is to re-run `/test` after any change to an AC's meaning.
 
 ## Ubiquitous language & ADRs
 
@@ -78,11 +117,14 @@ Two supporting skills make this work, both ported near-verbatim from mattpocock/
 | `build` | `/build` (explicit only) | Implement tasks one at a time |
 | `test` | `/test` (explicit only) | Verify acceptance criteria with real evidence |
 | `review` | `/review` (explicit only) | Final spec-conformance verdict |
+| `where` | `/where` (explicit only) | Read-only status: which pipeline gate a feature is at + next command |
+| `ship` | `/ship` (explicit only) | Branch, commit per task, draft PR; delegates to code-review/security-review |
 | `tdd` | automatic | Red-green-refactor nudge when writing new behavior |
 | `domain-modeling` | automatic | Maintain `CONTEXT.md` glossary + `docs/adr/` decisions |
 | `grilling` | automatic | Relentless one-question-at-a-time interview |
 | `grill-with-docs` | `/grill-with-docs` (explicit only) | `grilling` + `domain-modeling` combined, for standalone design sessions |
 | `handoff` | `/handoff` (explicit only) | Compact the current conversation into a handoff doc for another agent |
+| `skill-gap-scan` | automatic | Detect repeated friction and recommend which workflow should become a new skill |
 | `prototype` | automatic | Throwaway prototype (logic or UI) to answer a design question fast |
 
 ## Credits
