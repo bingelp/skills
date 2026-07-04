@@ -42,6 +42,11 @@ specs/<slug>/
 If a phase's required input file is missing, it tells you which command to run first instead of
 improvising.
 
+`/where` is a read-only status check across a feature's `specs/<slug>/` artifacts — it reports which
+gate you're at (`spec ✓ plan ✓ build 3/7 test — review —`) and the single command to run next.
+Useful when returning to a feature after a break, since the pipeline is stateful but otherwise has no
+way to query the current state.
+
 `/review` is a **spec-conformance** check (did we build what `/spec` said), not a code-quality or
 security review — pair it with your existing code-review/security-review tooling for that.
 
@@ -86,6 +91,7 @@ Two supporting skills make this work, both ported near-verbatim from mattpocock/
 | `build` | `/build` (explicit only) | Implement tasks one at a time |
 | `test` | `/test` (explicit only) | Verify acceptance criteria with real evidence |
 | `review` | `/review` (explicit only) | Final spec-conformance verdict |
+| `where` | `/where` (explicit only) | Read-only status: which pipeline gate a feature is at + next command |
 | `tdd` | automatic | Red-green-refactor nudge when writing new behavior |
 | `domain-modeling` | automatic | Maintain `CONTEXT.md` glossary + `docs/adr/` decisions |
 | `grilling` | automatic | Relentless one-question-at-a-time interview |
