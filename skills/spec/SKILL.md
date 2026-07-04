@@ -53,5 +53,6 @@ Explicit invocation only (`/spec`). Typical trigger: the user wants to start a n
 - For greenfield work, skipping technical baseline constraints (stack/runtime/deploy/data/observability) and leaving `/plan` to guess.
 - Forcing a spec through while a central product question is still unresolved, when a quick `prototype` would de-risk it.
 - Acceptance criteria that are vague ("works well", "is fast") — make them checkable.
+- Writing acceptance criteria without stable `AC<n>` IDs, or renumbering existing ones when editing the spec — downstream `/test` and `/review` cite these IDs; renumbering silently breaks traceability. Append new IDs, never reuse or shift old ones.
 - Proceeding to `/plan` yourself instead of stopping for approval.
 - Silently assuming a visual style (a default framework theme, or "matching the reference" without confirming how much of the reference) for a UI-bearing feature instead of asking.

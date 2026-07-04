@@ -47,3 +47,4 @@ Each criterion should be:
 - Testable: can be verified with a command, scenario, or check.
 - Binary: clearly pass/fail (not "seems better").
 - Traceable: maps back to one or more requirements.
+- Identified: carries a stable `AC<n>` ID so `/test` and `/review` can cite it by name.

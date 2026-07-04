@@ -18,7 +18,7 @@ Explicit invocation only (`/test`). Requires `specs/<slug>/spec.md` (for accepta
 
 1. Find `specs/<slug>/spec.md` and `specs/<slug>/tasks.md`. If tasks aren't all checked off, stop and tell the user to finish `/build` first.
 2. For each acceptance criterion in the spec, actually exercise it: run the test suite, run the feature, hit the endpoint, check the UI in a browser — whatever proves the behavior, not just reading the code.
-3. Append a **Verification** section to `specs/<slug>/tasks.md` listing each acceptance criterion with a pass/fail and the evidence (test name, command output, screenshot description).
+3. Append a **Verification** section to `specs/<slug>/tasks.md` listing each acceptance criterion **by its `AC<n>` ID** with a pass/fail and the evidence (test name, command output, screenshot description). Cite the ID exactly as written in `spec.md`; if the spec has a criterion with no ID, flag it rather than inventing one. Cover every `AC<n>` in the spec — a missing ID in your Verification section reads as untested.
 4. If something fails, don't paper over it — report it and tell the user to go back to `/build` (or `/plan` if the gap is a planning issue).
 5. If everything passes, tell the user: "All acceptance criteria verified. Run `/review` for a final spec-conformance pass."
 

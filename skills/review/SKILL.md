@@ -19,10 +19,10 @@ Explicit invocation only (`/review`). Requires `specs/<slug>/spec.md`, `specs/<s
 
 1. Find `specs/<slug>/spec.md` and `specs/<slug>/plan.md`. If either doesn't exist, stop and tell the user to run `/spec` or `/plan` first. If `/test` hasn't been run (no Verification section in `specs/<slug>/tasks.md`), stop and tell the user to run `/test` first.
 2. Diff the actual implementation against `specs/<slug>/plan.md`'s stated approach. Note any deviations and whether they were justified.
-3. Walk every acceptance criterion in `specs/<slug>/spec.md` one more time against the real diff (not the `/test` output — independently confirm).
+3. Walk every acceptance criterion in `specs/<slug>/spec.md` one more time against the real diff (not the `/test` output — independently confirm). Reference each by its `AC<n>` ID so your verdict lines up one-to-one with `/test`'s Verification section and any ID present in `spec.md` but absent from that section is caught as a gap.
 4. Check for domain drift: did the build introduce terminology that contradicts `CONTEXT.md`, or make a hard-to-reverse call that should have an ADR but doesn't? Flag both — use `domain-modeling` to fix drift or write the missing ADR before closing out.
 5. Write `specs/<slug>/review.md`:
-   - **Verdict per acceptance criterion** — met / not met / partially met
+   - **Verdict per acceptance criterion** — `AC<n>`: met / not met / partially met
    - **Deviations from the plan** — what changed and why
    - **Domain/ADR gaps** — glossary drift or undocumented hard-to-reverse decisions found
    - **Open follow-ups** — anything explicitly out of scope but worth flagging

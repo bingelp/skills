@@ -38,9 +38,14 @@ Use this template for `specs/<slug>/spec.md`.
 
 ## Acceptance Criteria
 
-- [ ] Criterion 1 (specific and verifiable)
-- [ ] Criterion 2 (specific and verifiable)
-- [ ] Criterion 3 (specific and verifiable)
+Each criterion carries a stable ID (`AC1`, `AC2`, …). Assign them sequentially. When you
+add a criterion later, append the next unused number — **never renumber or reuse an ID**,
+even if an earlier one is removed. `/test` and `/review` cite these IDs, so they must stay
+fixed once written (same append-only rule as ADR numbering).
+
+- [ ] **AC1** — Criterion 1 (specific and verifiable)
+- [ ] **AC2** — Criterion 2 (specific and verifiable)
+- [ ] **AC3** — Criterion 3 (specific and verifiable)
 
 ## Assumptions
 
