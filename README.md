@@ -6,6 +6,14 @@ A personal Claude Code skills library built around one deliberate, gated workflo
 /spec  →  /plan  →  /build  →  /test  →  /review
 ```
 
+When uncertainty is high, use a prototype pass first:
+
+```
+/prototype  →  /spec  →  /plan  →  /build  →  /test  →  /review
+```
+
+Use this path when the question is still ambiguous after interview (for example, uncertain state model behavior, unclear interaction design, or multiple plausible approaches with low confidence).
+
 Each phase is a skill in `skills/<name>/SKILL.md`. Unlike command-driven setups, invocation is
 controlled entirely through skill frontmatter:
 
@@ -83,6 +91,7 @@ Two supporting skills make this work, both ported near-verbatim from mattpocock/
 | `grilling` | automatic | Relentless one-question-at-a-time interview |
 | `grill-with-docs` | `/grill-with-docs` (explicit only) | `grilling` + `domain-modeling` combined, for standalone design sessions |
 | `handoff` | `/handoff` (explicit only) | Compact the current conversation into a handoff doc for another agent |
+| `skill-gap-scan` | automatic | Detect repeated friction and recommend which workflow should become a new skill |
 | `prototype` | automatic | Throwaway prototype (logic or UI) to answer a design question fast |
 
 ## Credits
