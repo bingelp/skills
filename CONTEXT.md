@@ -12,6 +12,21 @@ Canonical terms for this skills repo. Use these consistently; avoid the listed a
 - **artifact** — a file a step writes under `specs/<slug>/` (`spec.md`, `plan.md`, `tasks.md`,
   `review.md`). Used as the structural signal for attribution.
 
+## Build loop
+
+- **build orchestrator** — the `/build` session itself. It never implements a task
+  directly; it dispatches one **task subagent** per task and stays alive across the
+  whole feature. Keeping implementation work out of its own context is what bounds
+  its growth to `O(tasks)` instead of `O(tasks²)`.
+- **task subagent** — a disposable subagent the build orchestrator spawns (one per
+  task, sequentially, never in parallel) to implement and verify exactly one task
+  in its own isolated context, then report back a **task note**.
+- **task note** — a short structured entry appended to a task's line in `tasks.md`
+  when it's checked off: what changed, decisions/deviations, verification evidence.
+  The next task subagent reads this instead of the previous one's full transcript.
+  _Avoid_: "handoff" — that term is reserved for the `handoff` skill's whole-session
+  compaction document (`handoffs/<slug>.md`), a different mechanism.
+
 ## Cost tracking (`/tally`)
 
 - **tally** — the read-only per-step + total token/USD report produced by `/tally`. Not "cost
