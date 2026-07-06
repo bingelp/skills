@@ -118,6 +118,7 @@ Two supporting skills make this work, both ported near-verbatim from mattpocock/
 | `test` | `/test` (explicit only) | Verify acceptance criteria with real evidence |
 | `review` | `/review` (explicit only) | Final spec-conformance verdict |
 | `where` | `/where` (explicit only) | Read-only status: which pipeline gate a feature is at + next command |
+| `tally` | `/tally` (explicit only) | Read-only per-step + total token/USD tally for a feature |
 | `ship` | `/ship` (explicit only) | Branch, commit per task, draft PR; delegates to code-review/security-review |
 | `tdd` | automatic | Red-green-refactor nudge when writing new behavior |
 | `domain-modeling` | automatic | Maintain `CONTEXT.md` glossary + `docs/adr/` decisions |
