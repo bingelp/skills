@@ -20,6 +20,16 @@ tooling. It does git mechanics and delegation; it does **not** itself review cod
 Explicit invocation only (`/ship`). Requires a passing `/review`: a `specs/<slug>/review.md`
 with every acceptance criterion met. Don't ship a feature whose review found unmet criteria.
 
+## Where artifacts live
+
+Every `specs/<slug>/…` path below resolves under the repo's **shared git dir**, not the working tree:
+
+```sh
+SPECS="$(git rev-parse --path-format=absolute --git-common-dir)/specs"   # e.g. …/.git/specs
+```
+
+Storing artifacts there keeps them visible across every session and worktree — including the background-isolated steps Claude Code may switch into automatically — while making them impossible to accidentally commit. Outside a git repo, fall back to `./specs`.
+
 ## Process
 
 1. **Preconditions.** Find `specs/<slug>/`. Require `review.md`; if it's missing, stop and

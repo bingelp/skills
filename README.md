@@ -30,15 +30,25 @@ There's no `.claude/commands/` layer, no agent personas, no hooks — the skill 
 
 Each phase reads the previous phase's output, writes its own, and stops for your approval before the
 next phase runs. Nothing auto-chains. Artifacts live in the project you're working in (not this repo),
-under a per-feature folder:
+under a per-feature folder in the project's **shared git dir**:
 
 ```
-specs/<slug>/
+<git-common-dir>/specs/<slug>/      # resolve with: git rev-parse --path-format=absolute --git-common-dir
 ├── spec.md      # /spec   — problem, goals, requirements, acceptance criteria
 ├── plan.md      # /plan   — technical approach, files touched, key decisions
 ├── tasks.md     # /plan writes it, /build checks tasks off, /test appends verification
 └── review.md    # /review — final spec-conformance verdict
 ```
+
+Putting artifacts under the shared git dir (`.git/specs/`, not a working-tree `specs/`) is deliberate.
+The pipeline is **stateful across sessions** — by convention each phase runs in a fresh session to keep
+context slim, and Claude Code may transparently switch a step into a background-isolated worktree. A
+worktree gets its own working directory but shares the one `.git`, and crucially **ignored/untracked
+files do not cross into a worktree** — so a `specs/` folder that's `.gitignore`d becomes invisible to
+the next step, breaking the hand-off. Resolving to `<git-common-dir>/specs` sidesteps this: the path is
+identical from the main tree and every worktree, the artifacts are never committed (they live inside
+`.git`), and there's no `.gitignore` entry to maintain. `git rev-parse --git-common-dir` also makes the
+location deterministic, so `/where` and `/tally` can always find it.
 
 If a phase's required input file is missing, it tells you which command to run first instead of
 improvising.

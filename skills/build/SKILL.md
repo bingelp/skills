@@ -15,6 +15,16 @@ Implement the tasks in `specs/<slug>/tasks.md`, one at a time, in thin vertical 
 
 Explicit invocation only (`/build`). Requires `specs/<slug>/plan.md` and `specs/<slug>/tasks.md`.
 
+## Where artifacts live
+
+Every `specs/<slug>/…` path below resolves under the repo's **shared git dir**, not the working tree:
+
+```sh
+SPECS="$(git rev-parse --path-format=absolute --git-common-dir)/specs"   # e.g. …/.git/specs
+```
+
+Storing artifacts there keeps them visible across every session and worktree — including the background-isolated steps Claude Code may switch into automatically — while making them impossible to accidentally commit. Outside a git repo, fall back to `./specs`.
+
 ## Process
 
 1. Find `specs/<slug>/tasks.md` and `specs/<slug>/plan.md`. If either doesn't exist, stop and tell the user to run `/plan` first. Read `plan.md`'s Approach and Files/modules touched sections so you're working from its reasoning instead of re-exploring the codebase from scratch. Also read `CONTEXT.md` and any ADRs in the area you're touching — name things per the glossary and don't casually contradict a recorded decision.

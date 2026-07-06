@@ -11,6 +11,7 @@ import glob
 import json
 import os
 import re
+import subprocess
 
 TOKEN_TYPES = ("input", "output", "cache_w", "cache_r")
 _USAGE_KEYS = {
@@ -179,9 +180,24 @@ def resolve_step(data, feature):
     return None
 
 
+def specs_dir():
+    """The shared specs directory: <git-common-dir>/specs. That location is
+    identical from the main tree and every linked/background-isolated worktree
+    (they share one .git), and living inside .git means it is never committed.
+    Falls back to <cwd>/specs outside a git repo."""
+    try:
+        common = subprocess.run(
+            ["git", "rev-parse", "--path-format=absolute", "--git-common-dir"],
+            capture_output=True, text=True, check=True,
+        ).stdout.strip()
+    except (subprocess.CalledProcessError, FileNotFoundError, OSError):
+        common = ""
+    return os.path.join(common, "specs") if common else os.path.join(os.getcwd(), "specs")
+
+
 def spec_features():
     """Feature slugs that have a specs/<slug>/ directory in the current project."""
-    base = os.path.join(os.getcwd(), "specs")
+    base = specs_dir()
     if not os.path.isdir(base):
         return []
     return sorted(

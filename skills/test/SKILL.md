@@ -14,6 +14,16 @@ Check the implementation against `spec.md`'s acceptance criteria, one by one, wi
 
 Explicit invocation only (`/test`). Requires `specs/<slug>/spec.md` (for acceptance criteria) and a `specs/<slug>/tasks.md` with all tasks checked off.
 
+## Where artifacts live
+
+Every `specs/<slug>/…` path below resolves under the repo's **shared git dir**, not the working tree:
+
+```sh
+SPECS="$(git rev-parse --path-format=absolute --git-common-dir)/specs"   # e.g. …/.git/specs
+```
+
+Storing artifacts there keeps them visible across every session and worktree — including the background-isolated steps Claude Code may switch into automatically — while making them impossible to accidentally commit. Outside a git repo, fall back to `./specs`.
+
 ## Process
 
 1. Find `specs/<slug>/spec.md` and `specs/<slug>/tasks.md`. If tasks aren't all checked off, stop and tell the user to finish `/build` first.

@@ -23,6 +23,16 @@ Explicit invocation only (`/spec`). Typical trigger: the user wants to start a n
 
 **Don't bother for:** one-line fixes, typo corrections, or anything where `/plan` alone would be overkill — tell the user so and skip straight to implementing if they insist.
 
+## Where artifacts live
+
+Every `specs/<slug>/…` path below resolves under the repo's **shared git dir**, not the working tree:
+
+```sh
+SPECS="$(git rev-parse --path-format=absolute --git-common-dir)/specs"   # e.g. …/.git/specs
+```
+
+Storing artifacts there keeps them visible across every session and worktree — including the background-isolated steps Claude Code may switch into automatically — while making them impossible to accidentally commit. Outside a git repo, fall back to `./specs`.
+
 ## Process
 
 1. If `CONTEXT.md` (or `CONTEXT-MAP.md`) exists, read it first so your interview and spec use established terms.

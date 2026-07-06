@@ -20,6 +20,16 @@ Explicit invocation only (`/where`). Typical trigger: returning to a feature aft
 break, or checking progress before deciding whether to run the next phase. If nothing
 is in flight, it says so and points at `/spec`.
 
+## Where artifacts live
+
+Every `specs/<slug>/…` path below resolves under the repo's **shared git dir**, not the working tree:
+
+```sh
+SPECS="$(git rev-parse --path-format=absolute --git-common-dir)/specs"   # e.g. …/.git/specs
+```
+
+Storing artifacts there keeps them visible across every session and worktree — including the background-isolated steps Claude Code may switch into automatically — while making them impossible to accidentally commit. Outside a git repo, fall back to `./specs`.
+
 ## Process
 
 1. Locate features. Look for `specs/*/` directories.
