@@ -31,7 +31,7 @@ Storing artifacts there keeps them visible across every session and worktree —
 2. Take the first unchecked task. Implement just that task — don't jump ahead to later tasks even if it'd be convenient.
 3. Verify the task works (run it, run relevant tests, check the behavior) before checking it off.
 4. Check the task off in `specs/<slug>/tasks.md` and briefly note what changed.
-5. Repeat until all tasks are checked, or until you hit something the plan didn't anticipate — in that case, stop and surface it rather than improvising a design decision. If resolving it means the `plan.md` (or `spec.md`) is now wrong, fix the artifact — don't just build against a plan you've silently revised in your head. Make the change through the owning phase, reconcile downstream per [where/RECONCILE.md](../where/RECONCILE.md), and only then resume building. If it's a hard-to-reverse decision made on the fly, use `domain-modeling` to decide whether it needs an ADR.
+5. Repeat until all tasks are checked, or until you hit something the plan didn't anticipate — in that case, stop and surface it rather than improvising a design decision. If resolving it means the `plan.md` (or `spec.md`) is now wrong, fix the artifact — don't just build against a plan you've silently revised in your head. Make the change through the owning step, reconcile downstream per [where/RECONCILE.md](../where/RECONCILE.md), and only then resume building. If it's a hard-to-reverse decision made on the fly, use `domain-modeling` to decide whether it needs an ADR.
 6. Once every task is checked, tell the user: "All tasks complete. Run `/test` to verify against the spec's acceptance criteria."
 
 ## Red Flags

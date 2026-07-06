@@ -14,7 +14,7 @@ When uncertainty is high, use a prototype pass first:
 
 Use this path when the question is still ambiguous after interview (for example, uncertain state model behavior, unclear interaction design, or multiple plausible approaches with low confidence).
 
-Each phase is a skill in `skills/<name>/SKILL.md`. Unlike command-driven setups, invocation is
+Each step is a skill in `skills/<name>/SKILL.md`. Unlike command-driven setups, invocation is
 controlled entirely through skill frontmatter:
 
 - The pipeline skills (`spec`, `plan`, `build`, `test`, `review`, `ship`, plus the `where` status
@@ -28,21 +28,27 @@ There's no `.claude/commands/` layer, no agent personas, no hooks — the skill 
 
 ## The pipeline
 
-Each phase reads the previous phase's output, writes its own, and stops for your approval before the
-next phase runs. Nothing auto-chains. Artifacts live in the project you're working in (not this repo),
+Each step reads the previous step's output, writes its own, and stops for your approval before the
+next step runs. Nothing auto-chains. Artifacts live in the project you're working in (not this repo),
 under a per-feature folder in the project's **shared git dir**:
 
 ```
-<git-common-dir>/specs/<slug>/      # resolve with: git rev-parse --path-format=absolute --git-common-dir
+# git rev-parse --path-format=absolute --git-common-dir
+<git-common-dir>/specs/<slug>/
 ├── spec.md      # /spec   — problem, goals, requirements, acceptance criteria
 ├── plan.md      # /plan   — technical approach, files touched, key decisions
 ├── tasks.md     # /plan writes it, /build checks tasks off, /test appends verification
 └── review.md    # /review — final spec-conformance verdict
 ```
 
+> [!IMPORTANT]
+> **Start a new session for each step.** The artifact is the hand-off — it contains everything the
+> next step needs. Opening a fresh session keeps context slim and focused; don't carry a long session
+> forward into the next step.
+
 Putting artifacts under the shared git dir (`.git/specs/`, not a working-tree `specs/`) is deliberate.
-The pipeline is **stateful across sessions** — by convention each phase runs in a fresh session to keep
-context slim, and Claude Code may transparently switch a step into a background-isolated worktree. A
+The pipeline is **stateful across sessions**, and Claude Code may transparently switch a step into a
+background-isolated worktree. A
 worktree gets its own working directory but shares the one `.git`, and crucially **ignored/untracked
 files do not cross into a worktree** — so a `specs/` folder that's `.gitignore`d becomes invisible to
 the next step, breaking the hand-off. Resolving to `<git-common-dir>/specs` sidesteps this: the path is
@@ -50,7 +56,7 @@ identical from the main tree and every worktree, the artifacts are never committ
 `.git`), and there's no `.gitignore` entry to maintain. `git rev-parse --git-common-dir` also makes the
 location deterministic, so `/where` and `/tally` can always find it.
 
-If a phase's required input file is missing, it tells you which command to run first instead of
+If a step's required input file is missing, it tells you which command to run first instead of
 improvising.
 
 `/where` is a read-only status check across a feature's `specs/<slug>/` artifacts — it reports which
@@ -65,7 +71,7 @@ security review — pair it with your existing code-review/security-review tooli
 branch, atomic commits mapped to the tasks, and a draft PR built from `spec.md` + `review.md` — then
 hands off to `/code-review` and `/security-review` for the code-quality/security gates this pipeline
 deliberately delegates. It confirms before any outward-facing step (push, PR) and never merges. Unlike
-the other phases it writes no `specs/<slug>/` artifact; its output is the branch, commits, and PR.
+the other steps it writes no `specs/<slug>/` artifact; its output is the branch, commits, and PR.
 
 ## Looping back
 
@@ -76,8 +82,8 @@ invalidates everything downstream of it**. Left unmanaged, that drift is invisib
 
 The fix is a reconciliation discipline rather than a rule against looping back:
 
-- Each phase skill, when it changes an artifact that already has downstream artifacts, reconciles them
-  in the same pass — re-run the affected phase, edit-and-revalidate, or explicitly confirm still-valid.
+- Each step skill, when it changes an artifact that already has downstream artifacts, reconciles them
+  in the same pass — re-run the affected step, edit-and-revalidate, or explicitly confirm still-valid.
   The protocol (which change invalidates what) lives in
   [`skills/where/RECONCILE.md`](skills/where/RECONCILE.md).
 - `/where` is the backstop: it detects drift (an `AC<n>` with no verification entry, an upstream file
@@ -104,7 +110,7 @@ The fix is a reconciliation discipline rather than a rule against looping back:
 a real trade-off; see `domain-modeling/ADR-FORMAT.md` for the full test. Both are created lazily, the
 moment there's a real term or decision to capture — not scaffolded up front.
 
-This isn't a separate phase — it's threaded through the pipeline: `/spec` and `/plan` sharpen fuzzy
+This isn't a separate step — it's threaded through the pipeline: `/spec` and `/plan` sharpen fuzzy
 terms and read existing ones before writing anything, `/plan` offers ADRs for architectural forks,
 `/build` respects both while implementing, and `/review` flags glossary drift or missing ADRs as part
 of its verdict.
@@ -144,7 +150,7 @@ This repo borrows ideas and, in several cases, ported content from two existing 
 
 - [addyosmani/agent-skills](https://github.com/addyosmani/agent-skills) — the shape of the gated
   `spec → plan → build → test → review` pipeline with persisted hand-off artifacts and human-approval
-  checkpoints between phases.
+  checkpoints between steps.
 - [mattpocock/skills](https://github.com/mattpocock/skills) — the terse SKILL.md style, the
   user-invoked/model-invoked split via frontmatter, and the `domain-modeling`, `grilling`,
   `grill-with-docs`, `tdd`, `handoff`, and `prototype` skills, ported here directly or near-verbatim.
