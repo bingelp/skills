@@ -37,14 +37,22 @@ under a per-feature folder in the project's **shared git dir**:
 <git-common-dir>/specs/<slug>/
 ├── spec.md      # /spec   — problem, goals, requirements, acceptance criteria
 ├── plan.md      # /plan   — technical approach, files touched, key decisions
-├── tasks.md     # /plan writes it, /build checks tasks off, /test appends verification
+├── tasks.md     # /plan writes it, /build's task subagents check tasks off + append task notes,
+│                #   /test appends verification
 └── review.md    # /review — final spec-conformance verdict
 ```
+
+Individual tasks in `tasks.md` may carry an optional trailing `` `[model: X]` `` tag — `/plan` adds it
+where a task warrants a specific model, and `/build`'s orchestrator dispatches that task's subagent
+with it; a task with no tag gets the orchestrator's default (`sonnet`).
 
 > [!IMPORTANT]
 > **Start a new session for each step.** The artifact is the hand-off — it contains everything the
 > next step needs. Opening a fresh session keeps context slim and focused; don't carry a long session
-> forward into the next step.
+> forward into the next step. `/build` is the one step that spans more than a single session: a
+> **build orchestrator** session dispatches one disposable **task subagent** per task in
+> `tasks.md`, sequentially, so no single session's context grows with the whole feature's
+> implementation work — see `skills/build/SKILL.md`.
 
 Putting artifacts under the shared git dir (`.git/specs/`, not a working-tree `specs/`) is deliberate.
 The pipeline is **stateful across sessions**, and Claude Code may transparently switch a step into a
@@ -137,7 +145,7 @@ Two supporting skills make this work, both ported near-verbatim from mattpocock/
 |---|---|---|
 | `spec` | `/spec` (explicit only) | Interview + write the spec and acceptance criteria |
 | `plan` | `/plan` (explicit only) | Technical approach + atomic task breakdown |
-| `build` | `/build` (explicit only) | Implement tasks one at a time |
+| `build` | `/build` (explicit only) | Orchestrator dispatches one task subagent per task, one at a time |
 | `test` | `/test` (explicit only) | Verify acceptance criteria with real evidence |
 | `review` | `/review` (explicit only) | Final spec-conformance verdict |
 | `where` | `/where` (explicit only) | Read-only status: which pipeline gate a feature is at + next command |
