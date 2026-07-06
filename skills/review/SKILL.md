@@ -15,6 +15,16 @@ A spec-conformance review: did the finished work actually match what `/spec` pro
 
 Explicit invocation only (`/review`). Requires `specs/<slug>/spec.md`, `specs/<slug>/plan.md`, and a passing `/test` pass.
 
+## Where artifacts live
+
+Every `specs/<slug>/…` path below resolves under the repo's **shared git dir**, not the working tree:
+
+```sh
+SPECS="$(git rev-parse --path-format=absolute --git-common-dir)/specs"   # e.g. …/.git/specs
+```
+
+Storing artifacts there keeps them visible across every session and worktree — including the background-isolated steps Claude Code may switch into automatically — while making them impossible to accidentally commit. Outside a git repo, fall back to `./specs`.
+
 ## Process
 
 1. Find `specs/<slug>/spec.md` and `specs/<slug>/plan.md`. If either doesn't exist, stop and tell the user to run `/spec` or `/plan` first. If `/test` hasn't been run (no Verification section in `specs/<slug>/tasks.md`), stop and tell the user to run `/test` first.

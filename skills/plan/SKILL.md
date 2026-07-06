@@ -17,6 +17,16 @@ Explicit invocation only (`/plan`). Requires an existing `specs/<slug>/spec.md`.
 
 **Don't bother for:** trivial changes where `/spec` was already skipped — go straight to `/build`.
 
+## Where artifacts live
+
+Every `specs/<slug>/…` path below resolves under the repo's **shared git dir**, not the working tree:
+
+```sh
+SPECS="$(git rev-parse --path-format=absolute --git-common-dir)/specs"   # e.g. …/.git/specs
+```
+
+Storing artifacts there keeps them visible across every session and worktree — including the background-isolated steps Claude Code may switch into automatically — while making them impossible to accidentally commit. Outside a git repo, fall back to `./specs`.
+
 ## Process
 
 1. Find `specs/<slug>/spec.md`. If no slug is obvious from context, ask which feature this is for. If `spec.md` doesn't exist, stop and tell the user to run `/spec` first. Read `CONTEXT.md` (or `CONTEXT-MAP.md`) if it exists so the plan's vocabulary matches the project's.
