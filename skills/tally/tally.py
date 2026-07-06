@@ -38,26 +38,38 @@ PRICES = {
 
 
 def transcript_dir():
-    """~/.claude/projects/<encoded-cwd>/ where <encoded-cwd> is cwd with / -> -."""
-    encoded = os.getcwd().replace("/", "-")
+    """~/.claude/projects/<encoded-cwd>/ where <encoded-cwd> is cwd with every
+    character outside [A-Za-z0-9] replaced by '-' (matches Claude Code's real
+    on-disk encoding, including dotted segments like .claude/worktrees/<name>)."""
+    encoded = re.sub(r"[^A-Za-z0-9]", "-", os.getcwd())
     return os.path.join(os.path.expanduser("~/.claude/projects"), encoded)
 
 
-def iter_sessions():
-    """Yield (path, [parsed-json-lines]) for each *.jsonl transcript, skipping
+def _read_transcript(path):
+    """Parse one *.jsonl transcript file into a list of records, skipping
     malformed lines safely."""
-    for path in sorted(glob.glob(os.path.join(transcript_dir(), "*.jsonl"))):
-        records = []
-        with open(path, encoding="utf-8") as fh:
-            for line in fh:
-                line = line.strip()
-                if not line:
-                    continue
-                try:
-                    records.append(json.loads(line))
-                except json.JSONDecodeError:
-                    continue
-        yield path, records
+    records = []
+    with open(path, encoding="utf-8") as fh:
+        for line in fh:
+            line = line.strip()
+            if not line:
+                continue
+            try:
+                records.append(json.loads(line))
+            except json.JSONDecodeError:
+                continue
+    return records
+
+
+def iter_sessions():
+    """Yield (path, [parsed-json-lines]) for each *.jsonl transcript, both
+    top-level sessions and nested subagent sessions under */subagents/, each
+    treated as its own independent session."""
+    base = transcript_dir()
+    paths = sorted(glob.glob(os.path.join(base, "*.jsonl")))
+    paths += sorted(glob.glob(os.path.join(base, "*", "subagents", "*.jsonl")))
+    for path in paths:
+        yield path, _read_transcript(path)
 
 
 def _tool_uses(records):
