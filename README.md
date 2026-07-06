@@ -64,6 +64,13 @@ gate you're at (`spec ✓ plan ✓ build 3/7 test — review —`) and the singl
 Useful when returning to a feature after a break, since the pipeline is stateful but otherwise has no
 way to query the current state.
 
+`/clean` is the destructive counterpart to `/where`: it removes the `specs/<slug>/` artifacts of
+features that are **complete** (a passing `review.md` with every `AC<n>` met), leaving in-flight work
+untouched. It always lists the candidates and waits for confirmation before deleting anything, and it
+excludes features whose review looks green but has drifted — so a spec that quietly changed after
+review isn't swept away as finished. Because the artifacts live inside `.git`, deleting a folder is the
+whole operation — nothing to commit, no `.gitignore` to update.
+
 `/review` is a **spec-conformance** check (did we build what `/spec` said), not a code-quality or
 security review — pair it with your existing code-review/security-review tooling for that.
 
@@ -134,6 +141,7 @@ Two supporting skills make this work, both ported near-verbatim from mattpocock/
 | `test` | `/test` (explicit only) | Verify acceptance criteria with real evidence |
 | `review` | `/review` (explicit only) | Final spec-conformance verdict |
 | `where` | `/where` (explicit only) | Read-only status: which pipeline gate a feature is at + next command |
+| `clean` | `/clean` (explicit only) | Delete completed features' spec artifacts from the shared git dir, after confirmation |
 | `tally` | `/tally` (explicit only) | Read-only per-step + total token/USD tally for a feature |
 | `ship` | `/ship` (explicit only) | Branch, commit per task, draft PR; delegates to code-review/security-review |
 | `tdd` | automatic | Red-green-refactor nudge when writing new behavior |
