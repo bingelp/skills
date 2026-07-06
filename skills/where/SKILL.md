@@ -17,7 +17,7 @@ to run next. This skill never writes — it only tells you where you are.
 ## When to Use
 
 Explicit invocation only (`/where`). Typical trigger: returning to a feature after a
-break, or checking progress before deciding whether to run the next phase. If nothing
+break, or checking progress before deciding whether to run the next step. If nothing
 is in flight, it says so and points at `/spec`.
 
 ## Where artifacts live
@@ -59,7 +59,7 @@ Storing artifacts there keeps them visible across every session and worktree —
      "Spec-conformance complete. Run `/code-review` and `/security-review` for code quality."
 4. Surface inconsistencies plainly rather than smoothing them over: a `plan.md` with no
    `tasks.md`, tasks checked off with no `plan.md`, or a Verification section written
-   before all tasks are checked. These usually mean a phase was interrupted or an
+   before all tasks are checked. These usually mean a step was interrupted or an
    upstream artifact changed — say which, don't silently pick a "current" gate.
 5. **Detect chain drift** — the pipeline is a dependency chain (`spec → plan → tasks →
    Verification → review`), and an upstream edit silently invalidates everything downstream.
@@ -129,7 +129,7 @@ is drift). This is a checkpoint, not a report.
 - Reporting `build ✓` when a Verification section is missing, or `test ✓` when tasks
   are still unchecked — read the actual markers, don't round up.
 - Writing to any file. `/where` is read-only; if the state is inconsistent, report it and
-  let the user decide which phase to re-run.
+  let the user decide which step to re-run.
 - Auto-running the recommended next command — this skill reports and stops.
 - Reporting all gates `✓` while ignoring drift — a green chain with a stale downstream
   artifact is worse than an obviously-incomplete one, because it reads as trustworthy. If an

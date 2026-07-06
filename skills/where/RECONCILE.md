@@ -33,7 +33,7 @@ that doesn't change what's required, invalidates nothing — don't manufacture r
 
 For every artifact to the right of the change, pick one — never leave one in an unknown state:
 
-1. **Re-run its phase** — the honest default when the change is substantive. Changed an AC?
+1. **Re-run its step** — the honest default when the change is substantive. Changed an AC?
    Re-run `/test` for it. Reshaped the approach? Re-run the affected part of `/plan`.
 2. **Targeted edit + re-validate** — when the change is small and localised, edit the
    downstream artifact directly and confirm it still holds, rather than regenerating it whole.
