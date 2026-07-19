@@ -23,7 +23,7 @@ Each arrow means "derived from." A change to any box may invalidate everything t
 |---|---|
 | **spec.md** — requirement, an `AC<n>` added / removed / reworded, scope | `plan.md` (does the approach still hold?), `tasks.md` (add tasks for new/changed ACs, drop tasks for removed ones), Verification (re-test any changed AC), `review.md` (now stale — re-run after) |
 | **plan.md** — approach, files touched, a key decision | `tasks.md` (do the tasks still implement this approach?), any build already done against the old approach, `review.md` |
-| **tasks.md** — added / removed / reshaped a task | build (implement or undo the delta), Verification (does the changed behavior still meet its AC?) |
+| **tasks.md** — added / removed / reshaped a task | build (implement or undo the delta), Verification (does the changed behavior still meet its AC?), and any `specs/<slug>/tasks/NN-slug.md` note file whose task number shifted or was removed — rename or delete it to match, so `tasks.md`'s pointers keep resolving |
 | **build** — deviated from the plan while implementing | `plan.md` (record the deviation there, don't just leave it in the code), then `review.md` will check it |
 
 **Only cascade when meaning changes.** Fixing a typo in spec prose, or clarifying wording
