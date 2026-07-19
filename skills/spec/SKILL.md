@@ -33,31 +33,35 @@ SPECS="$(git rev-parse --path-format=absolute --git-common-dir)/specs"   # e.g. 
 
 Storing artifacts there keeps them visible across every session and worktree — including the background-isolated steps Claude Code may switch into automatically — while making them impossible to accidentally commit. Outside a git repo, fall back to `./specs`.
 
+**The `./specs` fallback is a trap for greenfield projects.** If the project isn't under git yet, artifacts land in the plain working tree instead of the shared git dir. The moment any later step (`/build`, `/ship`, or an automatic background-isolated session) switches into a worktree, that working-tree `./specs` directory isn't there — it's a sibling checkout, not a copy. The fix is cheap (`git init` before anything is written) but only cheap *before* files exist to reconcile; catch it here, not three steps later.
+
 ## Process
 
-1. If `CONTEXT.md` (or `CONTEXT-MAP.md`) exists, read it first so your interview and spec use established terms.
-2. Interview one question at a time using `grilling`. Use [INTERVIEW-CHECKLIST.md](INTERVIEW-CHECKLIST.md) so coverage is complete without turning this file into a giant script.
-3. Use `domain-modeling` during the interview, not after it:
+1. Check whether the project is already under git version control (`git rev-parse --is-inside-work-tree`). If not, stop before doing anything else and strongly recommend the user run `git init` (and make an initial commit) first. Explain why: this pipeline's artifacts are meant to live under the shared git dir so they survive worktree switches later in the pipeline; without git, `/spec` falls back to writing `specs/` straight into the working tree, which then silently goes missing or drifts once `/build` or `/ship` moves into a worktree. If the user wants to proceed anyway, honor that, but make sure they know their specs will live in `./specs` in the plain working tree, not the shared location, and that they're accepting the worktree risk.
+2. If `CONTEXT.md` (or `CONTEXT-MAP.md`) exists, read it first so your interview and spec use established terms.
+3. Interview one question at a time using `grilling`. Use [INTERVIEW-CHECKLIST.md](INTERVIEW-CHECKLIST.md) so coverage is complete without turning this file into a giant script.
+4. Use `domain-modeling` during the interview, not after it:
    - If terms are vague or conflicting, sharpen them immediately.
    - The moment a domain term is confirmed, capture it in `CONTEXT.md` right away.
-4. If this is greenfield or the technical baseline is still unclear, capture it in the spec using [GREENFIELD-BASELINE.md](GREENFIELD-BASELINE.md). Treat these as delivery constraints, not deep architecture; keep hard technical trade-offs for `/plan` + ADRs.
-5. If the feature has a UI, treat visual style (color, type, spacing, theme, tone) as unknown by default. Ask explicitly whether to match references stylistically, use framework defaults, or define a new style direction.
-6. If a key product question is still ambiguous after interview (for example, unclear interaction model or uncertain state behavior), run `prototype` to answer that question before finalizing the spec. Capture the outcome as assumptions or requirements.
-7. For reasonable inferences, state assumptions explicitly and give the user a chance to correct before writing the spec, for example:
+5. If this is greenfield or the technical baseline is still unclear, capture it in the spec using [GREENFIELD-BASELINE.md](GREENFIELD-BASELINE.md). Treat these as delivery constraints, not deep architecture; keep hard technical trade-offs for `/plan` + ADRs.
+6. If the feature has a UI, treat visual style (color, type, spacing, theme, tone) as unknown by default. Ask explicitly whether to match references stylistically, use framework defaults, or define a new style direction.
+7. If a key product question is still ambiguous after interview (for example, unclear interaction model or uncertain state behavior), run `prototype` to answer that question before finalizing the spec. Capture the outcome as assumptions or requirements.
+8. For reasonable inferences, state assumptions explicitly and give the user a chance to correct before writing the spec, for example:
    ```
    ASSUMPTIONS:
    1. This only affects the web app, not the mobile client
    2. No new external dependency needed
    → Correct me now or I'll proceed.
    ```
-8. Pick a kebab-case slug for the feature. Create `specs/<slug>/spec.md` using [SPEC-TEMPLATE.md](SPEC-TEMPLATE.md).
+9. Pick a kebab-case slug for the feature. Create `specs/<slug>/spec.md` using [SPEC-TEMPLATE.md](SPEC-TEMPLATE.md).
 
    Do not add a "Domain Vocabulary" (or similarly-named) section to `spec.md` — canonical term definitions live in `CONTEXT.md` (via step 2), not here. `spec.md` should just use the established terms; if a definition would help a reader, reference `CONTEXT.md` rather than restating it.
-9. If this feature already has downstream artifacts (`plan.md`, `tasks.md`, `review.md`) — i.e. you're revising a spec mid-pipeline, not writing a fresh one — reconcile them per [where/RECONCILE.md](../where/RECONCILE.md) before handing back. An added/removed/reworded requirement or `AC<n>` invalidates the plan, tasks, and any verification derived from the old spec; don't leave them silently stale. Tell the user which downstream artifacts your change touched and what needs re-running.
-10. Show the user the spec (and any new/updated `CONTEXT.md`). Stop. Tell them: "Review this, and run `/plan` once you're happy with it."
+10. If this feature already has downstream artifacts (`plan.md`, `tasks.md`, `review.md`) — i.e. you're revising a spec mid-pipeline, not writing a fresh one — reconcile them per [where/RECONCILE.md](../where/RECONCILE.md) before handing back. An added/removed/reworded requirement or `AC<n>` invalidates the plan, tasks, and any verification derived from the old spec; don't leave them silently stale. Tell the user which downstream artifacts your change touched and what needs re-running.
+11. Show the user the spec (and any new/updated `CONTEXT.md`). Stop. Tell them: "Review this, and run `/plan` once you're happy with it."
 
 ## Red Flags
 
+- Skipping the git check, or writing to `./specs` without telling the user why (no git repo) and what it risks once a worktree enters the picture.
 - Writing the spec before requirements are concrete — go back to asking questions.
 - Using a term inconsistent with `CONTEXT.md` without flagging it — that's exactly the drift `domain-modeling` exists to catch.
 - Writing domain term definitions into `spec.md` (e.g. a "Domain Vocabulary" section) instead of `CONTEXT.md` — this is easy to do by default on greenfield work where no `CONTEXT.md` exists yet to prompt the habit, but it's exactly the case `domain-modeling` needs to run for.
