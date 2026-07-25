@@ -38,7 +38,7 @@ Storing artifacts there keeps them visible across every session and worktree —
    - **Chain drift** — any spec/plan/tasks/verification inconsistency found and how it was reconciled (or "none")
    - **Domain/ADR gaps** — glossary drift or undocumented hard-to-reverse decisions found
    - **Open follow-ups** — anything explicitly out of scope but worth flagging
-7. Show the user the review. Stop — this is the end of the pipeline, no further auto-chaining.
+7. Show the user the review. If this session is still worktree-isolated, ask the user whether to keep or remove the worktree before finishing, per [docs/worktrees.md](../../docs/worktrees.md). Stop — this is the end of the pipeline, no further auto-chaining.
 
 ## Red Flags
 

@@ -66,6 +66,9 @@ Storing artifacts there keeps them visible across every session and worktree —
    (or the commits are ready), recommend the passes this pipeline deliberately delegates:
    "Run `/code-review` and `/security-review` on the diff before merging." `/ship`'s job ends
    here — it does not run them itself, and it does not merge.
+7. **Worktree.** If this session is still worktree-isolated when this step ends, ask the user
+   whether to keep or remove the worktree before finishing, per
+   [docs/worktrees.md](../../docs/worktrees.md).
 
 ## Red Flags
 

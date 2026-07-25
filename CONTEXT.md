@@ -20,10 +20,13 @@ Canonical terms for this skills repo. Use these consistently; avoid the listed a
   its growth to `O(tasks)` instead of `O(tasks²)`.
 - **task subagent** — a disposable subagent the build orchestrator spawns (one per
   task, sequentially, never in parallel) to implement and verify exactly one task
-  in its own isolated context, then report back a **task note**.
-- **task note** — a short structured entry appended to a task's line in `tasks.md`
-  when it's checked off: what changed, decisions/deviations, verification evidence.
-  The next task subagent reads this instead of the previous one's full transcript.
+  in its own isolated context, then return — not write — a **task note** and a
+  `tasks.md` summary line in its response, for the orchestrator to persist.
+- **task note** — the full per-task write-up (what changed, decisions/deviations,
+  verification evidence) a task subagent returns; the build orchestrator persists
+  it as `specs/<slug>/tasks/NN-slug.md`, alongside a one-line summary + pointer it
+  appends to `tasks.md`. The next task subagent reads just that one file instead
+  of the previous one's full transcript.
   _Avoid_: "handoff" — that term is reserved for the `handoff` skill's whole-session
   compaction document (`handoffs/<slug>.md`), a different mechanism.
 

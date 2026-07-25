@@ -57,7 +57,7 @@ Storing artifacts there keeps them visible across every session and worktree —
 
    Do not add a "Domain Vocabulary" (or similarly-named) section to `spec.md` — canonical term definitions live in `CONTEXT.md` (via step 2), not here. `spec.md` should just use the established terms; if a definition would help a reader, reference `CONTEXT.md` rather than restating it.
 10. If this feature already has downstream artifacts (`plan.md`, `tasks.md`, `review.md`) — i.e. you're revising a spec mid-pipeline, not writing a fresh one — reconcile them per [where/RECONCILE.md](../where/RECONCILE.md) before handing back. An added/removed/reworded requirement or `AC<n>` invalidates the plan, tasks, and any verification derived from the old spec; don't leave them silently stale. Tell the user which downstream artifacts your change touched and what needs re-running.
-11. Show the user the spec (and any new/updated `CONTEXT.md`). Stop. Tell them: "Review this, and run `/plan` once you're happy with it."
+11. Show the user the spec (and any new/updated `CONTEXT.md`). If this session is still worktree-isolated, ask the user whether to keep or remove the worktree before finishing, per [docs/worktrees.md](../../docs/worktrees.md). Stop. Tell them: "Review this, and run `/plan` once you're happy with it."
 
 ## Red Flags
 
