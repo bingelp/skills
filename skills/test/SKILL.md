@@ -31,6 +31,7 @@ Storing artifacts there keeps them visible across every session and worktree —
 3. Append a **Verification** section to `specs/<slug>/tasks.md` listing each acceptance criterion **by its `AC<n>` ID** with a pass/fail and the evidence (test name, command output, screenshot description). Cite the ID exactly as written in `spec.md`; if the spec has a criterion with no ID, flag it rather than inventing one. Cover every `AC<n>` in the spec — a missing ID in your Verification section reads as untested.
 4. If something fails, don't paper over it — report it and tell the user to go back to `/build` (or `/plan` if the gap is a planning issue). If the failure reveals the *spec itself* was wrong and an `AC<n>` should change, that's an upstream edit: change it via `/spec` and reconcile the chain per [where/RECONCILE.md](../where/RECONCILE.md) — re-plan/re-build/re-test as the change requires. Never edit an AC from inside `/test` just to make it pass.
 5. If everything passes, tell the user: "All acceptance criteria verified. Run `/review` for a final spec-conformance pass."
+6. If this session is still worktree-isolated when this step ends, ask the user whether to keep or remove the worktree before finishing, per [docs/worktrees.md](../../docs/worktrees.md).
 
 ## Red Flags
 

@@ -107,6 +107,16 @@ The fix is a reconciliation discipline rather than a rule against looping back:
 - Stable `AC<n>` IDs make spec↔test drift content-detectable. The known blind spot is a *reworded* AC
   (same ID and count) — so the discipline is to re-run `/test` after any change to an AC's meaning.
 
+## Worktree isolation
+
+Claude Code may switch a session into its own isolated git worktree — a separate working
+directory that shares the one `.git` — either because you asked for it or because of
+project-level direction; this pipeline never requests that isolation on its own initiative. It
+matters here because a worktree left locked or dangling when a session ends can silently break
+the next pipeline step, since nothing downstream knows to look there. The rules for entering,
+holding, and leaving that isolation without leaving a mess live in
+[`docs/worktrees.md`](docs/worktrees.md).
+
 ## Ubiquitous language & ADRs
 
 `domain-modeling` maintains two project-level (not per-feature) files, ported from mattpocock's skills:
