@@ -37,7 +37,7 @@ the actual tell that something should be codified:
    convention, format, or constraint more than once, in different words,
    because it wasn't remembered from earlier in the pipeline stage.
 2. **Corrections to skill output** — an existing skill (`/spec`,
-   `/plan`, `/build`, `/test`, `/review`) produced something
+   `/to-plan`, `/build`, `/test`, `/review`) produced something
    the user had to fix by hand, and the fix follows a pattern rather than
    being a one-off.
 3. **Manual multi-step workarounds** — the user (or Claude) did a sequence
@@ -48,7 +48,7 @@ the actual tell that something should be codified:
    for the same tool/command pattern, suggesting either a permission rule
    or a scoped skill with `allowed-tools` would remove the friction.
 5. **Cross-stage glue** — something the user does by hand *between* two
-   pipeline stages (e.g., translating `/plan` output into a specific
+   pipeline stages (e.g., translating `/to-plan` output into a specific
    `/build` scaffold shape) that could be folded into one of the existing
    skills or become a connector skill between them.
 
@@ -111,7 +111,7 @@ new skill" is a valid and useful result.
 
 ## Notes on this pipeline specifically
 
-Since the existing pipeline is stage-based (`/spec` → `/plan` → `/build` →
+Since the existing pipeline is stage-based (`/spec` → `/to-plan` → `/build` →
 `/test` → `/review`), the most valuable gaps are usually at the **seams
 between stages**, not inside a single stage — that's where manual
 translation work tends to hide. Weight cross-stage glue (signal type 5)

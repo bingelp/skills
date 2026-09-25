@@ -4,31 +4,38 @@ Canonical terms for this skills repo. Use these consistently; avoid the listed a
 
 ## Pipeline
 
-- **pipeline** — the gated `/spec → /plan → /build → /test → /review → /ship` workflow.
+- **pipeline** — the gated `/spec → /to-plan → /build → /test → /review → /ship` workflow.
 - **step** — a single pipeline phase (spec, plan, build, test, review, ship). The unit of the
   cost breakdown in `/tally`. Prefer "step" over "phase" in user-facing skill output.
 - **feature** — a unit of work tracked under `specs/<slug>/`. The thing whose total cost `/tally`
   measures. Identified by its kebab-case **slug**.
-- **artifact** — a file a step writes under `specs/<slug>/` (`spec.md`, `plan.md`, `tasks.md`,
-  `review.md`). Used as the structural signal for attribution.
+- **artifact** — a file a step writes under `specs/<slug>/` at the repo root, committed on
+  the feature branch: `spec.md`, `plan.md` (approach + tasks), and `review.md` (Verification +
+  Verdict). Used as the structural signal for attribution.
 
 ## Build loop
 
 - **build orchestrator** — the `/build` session itself. It never implements a task
-  directly; it dispatches one **task subagent** per task and stays alive across the
-  whole feature. Keeping implementation work out of its own context is what bounds
-  its growth to `O(tasks)` instead of `O(tasks²)`.
-- **task subagent** — a disposable subagent the build orchestrator spawns (one per
-  task, sequentially, never in parallel) to implement and verify exactly one task
-  in its own isolated context, then return — not write — a **task note** and a
-  `tasks.md` summary line in its response, for the orchestrator to persist.
-- **task note** — the full per-task write-up (what changed, decisions/deviations,
-  verification evidence) a task subagent returns; the build orchestrator persists
-  it as `specs/<slug>/tasks/NN-slug.md`, alongside a one-line summary + pointer it
-  appends to `tasks.md`. The next task subagent reads just that one file instead
-  of the previous one's full transcript.
+  directly. It dispatches **task subagents**, records each result, and commits each
+  task. Keeping implementation work out of its own context is what bounds its
+  growth to `O(tasks)` instead of `O(tasks²)`.
+- **task subagent** — a disposable `task-builder` agent the build orchestrator spawns
+  to implement and verify exactly one task in its own isolated context. It never
+  touches git or `specs/`; it returns a fixed-shape report (`STATUS`, `FILES`,
+  `SUMMARY`, `VERIFIED`, …) for the orchestrator to record.
+- **wave** — the set of task subagents the orchestrator dispatches together in one
+  message. A wave is either a single task, or several ready `[P]` tasks with
+  disjoint `files:`.
+- **`[P]`** — `/to-plan`'s marking that a task is safe to run in a wave alongside
+  other `[P]` tasks. Unmarked tasks always run alone.
+  _Avoid_: "concurrent-safe", "parallelizable" as the marker name — the marker is `[P]`.
+- **done-line** — the single `done:` line the orchestrator adds under a checked task
+  in `plan.md`.
+- **task note** — the optional longer write-up for a task (a deviation's reasoning,
+  a non-obvious decision), persisted as `specs/<slug>/tasks/T<n>-slug.md` only when
+  it won't fit in a done-line.
   _Avoid_: "handoff" — that term is reserved for the `handoff` skill's whole-session
-  compaction document (`handoffs/<slug>.md`), a different mechanism.
+  compaction document, a different mechanism.
 
 ## Cost tracking (`/tally`)
 

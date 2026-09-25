@@ -6,7 +6,7 @@ end up worktree-isolated (by user request or project-level direction), these are
 using that isolation without leaving a mess for the next session.
 
 Referenced by `README.md` and by each pipeline skill's `SKILL.md`
-(`spec`, `plan`, `build`, `test`, `review`, `ship`).
+(`spec`, `to-plan`, `build`, `test`, `review`, `ship`).
 
 ## Entry and exit are user-instruction-only
 
@@ -42,9 +42,18 @@ If a pipeline step's session is about to end while it's still worktree-isolated,
 silently carry into the next step's session. Proactively ask the user whether to keep or remove
 the worktree — `ExitWorktree`'s `keep` and `remove` actions — before the session ends.
 
-Background: in the incident, a worktree created during `/plan` was left locked and unresolved
+Background: in the incident, a worktree created during `/plan` (now `/to-plan`) was left locked and unresolved
 because nothing in the process asked what to do with it. It later collided with a `/build` run
 that tried to use the same worktree. Asking before the session ends is what closes that gap.
+
+## Artifacts committed in a worktree live on the worktree's branch
+
+The pipeline commits its artifacts (and `/build` commits each task) on the current branch. A
+worktree usually has its own branch, so a step that runs worktree-isolated commits there, not on
+`feat/<slug>`. When asking the keep/remove question at the end of such a session, also tell the
+user which pipeline commits exist only on the worktree's branch. Those commits need to reach the
+feature branch (a fast-forward or merge) before the next step runs anywhere else, or that step
+won't see them. Don't recommend `remove` until they have.
 
 ## A locked worktree is a stop, not a workaround
 

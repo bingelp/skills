@@ -24,7 +24,11 @@ _WRITE_TOOLS = {"Write", "Edit", "NotebookEdit"}
 _ARTIFACTS = {"spec.md", "plan.md", "tasks.md", "review.md"}
 _SPECS_RE = re.compile(r"specs/([^/]+)/([^/\s]+)")
 _VERIFICATION_RE = re.compile(r"(?mi)^#{1,6}\s*Verification\b")
+_VERDICT_RE = re.compile(r"(?mi)^#{1,6}\s*Verdict\b")
 PIPELINE_STEPS = ("spec", "plan", "build", "test", "review", "ship")
+# Skill names that map onto a step under a different name (/plan was renamed
+# /to-plan to avoid colliding with Claude Code's built-in /plan command).
+_STEP_ALIASES = {"to-plan": "plan"}
 
 # USD per 1,000,000 tokens, per model, per token type. Cache-write uses the
 # 5-minute ephemeral rate (1.25x input); cache-read is 0.1x input.
@@ -93,8 +97,9 @@ def extract_session(records):
       skill_counts      {attributionSkill: count of records}
       refs              list of (slug, artifact_or_none, kind) where kind in {read, write}
       wrote_artifacts   set of (slug, artifact) written/edited
-      checkbox_flip     set of slugs whose tasks.md had a [ ] -> [x] flip
+      checkbox_flip     set of slugs whose plan.md (or legacy tasks.md) had a [ ] -> [x] flip
       wrote_verification set of slugs whose artifact gained a "## Verification" section
+      wrote_verdict     set of slugs whose review.md gained a "## Verdict" section
       usage_by_model    {model: {input, output, cache_w, cache_r}}
     """
     skill_counts = {}
@@ -102,10 +107,12 @@ def extract_session(records):
     wrote_artifacts = set()
     checkbox_flip = set()
     wrote_verification = set()
+    wrote_verdict = set()
     usage_by_model = {}
 
     for rec in records:
         skill = rec.get("attributionSkill")
+        skill = _STEP_ALIASES.get(skill, skill)
         if skill:
             skill_counts[skill] = skill_counts.get(skill, 0) + 1
 
@@ -143,13 +150,15 @@ def extract_session(records):
                 str(tool_input.get(k) or "")
                 for k in ("content", "new_string", "old_string")
             )
-            if artifact == "tasks.md":
+            if artifact in ("tasks.md", "plan.md"):
                 old = str(tool_input.get("old_string") or "")
                 new = str(tool_input.get("new_string") or "")
                 if "[ ]" in old and "[x]" in new:
                     checkbox_flip.add(slug)
             if _VERIFICATION_RE.search(blob):
                 wrote_verification.add(slug)
+            if artifact == "review.md" and _VERDICT_RE.search(blob):
+                wrote_verdict.add(slug)
 
     return {
         "skill_counts": skill_counts,
@@ -157,6 +166,7 @@ def extract_session(records):
         "wrote_artifacts": wrote_artifacts,
         "checkbox_flip": checkbox_flip,
         "wrote_verification": wrote_verification,
+        "wrote_verdict": wrote_verdict,
         "usage_by_model": usage_by_model,
     }
 
@@ -179,10 +189,15 @@ def resolve_step(data, feature):
         return max(step_skills, key=lambda s: (step_skills[s], PIPELINE_STEPS.index(s)))
 
     wrote = {a for slug, a in data["wrote_artifacts"] if slug == feature}
-    if ("review.md") in wrote:
+    # /test and /review both write review.md (Verification, then Verdict), so
+    # the section written decides the step; a review.md write with neither is
+    # a legacy /review.
+    if feature in data["wrote_verdict"]:
         return "review"
     if feature in data["wrote_verification"]:
         return "test"
+    if "review.md" in wrote:
+        return "review"
     if feature in data["checkbox_flip"]:
         return "build"
     if "plan.md" in wrote or "tasks.md" in wrote:
@@ -193,29 +208,37 @@ def resolve_step(data, feature):
 
 
 def specs_dir():
-    """The shared specs directory: <git-common-dir>/specs. That location is
-    identical from the main tree and every linked/background-isolated worktree
-    (they share one .git), and living inside .git means it is never committed.
-    Falls back to <cwd>/specs outside a git repo."""
+    """The feature artifacts directory: specs/ at the repo root, committed on
+    each feature's branch. Falls back to <cwd>/specs outside a git repo."""
+    top = _git("rev-parse", "--show-toplevel")
+    return os.path.join(top or os.getcwd(), "specs")
+
+
+def _git(*args):
+    """stdout of a git command, stripped; "" on any failure."""
     try:
-        common = subprocess.run(
-            ["git", "rev-parse", "--path-format=absolute", "--git-common-dir"],
-            capture_output=True, text=True, check=True,
+        return subprocess.run(
+            ["git", *args], capture_output=True, text=True, check=True,
         ).stdout.strip()
     except (subprocess.CalledProcessError, FileNotFoundError, OSError):
-        common = ""
-    return os.path.join(common, "specs") if common else os.path.join(os.getcwd(), "specs")
+        return ""
 
 
 def spec_features():
-    """Feature slugs that have a specs/<slug>/ directory in the current project."""
+    """Feature slugs with a specs/<slug>/ directory, either on disk or on any
+    local branch (a feature's artifacts only exist on disk while its branch is
+    checked out)."""
+    slugs = set()
     base = specs_dir()
-    if not os.path.isdir(base):
-        return []
-    return sorted(
-        name for name in os.listdir(base)
-        if os.path.isdir(os.path.join(base, name))
-    )
+    if os.path.isdir(base):
+        slugs.update(
+            name for name in os.listdir(base)
+            if os.path.isdir(os.path.join(base, name))
+        )
+    for branch in _git("for-each-ref", "--format=%(refname:short)", "refs/heads").splitlines():
+        for entry in _git("ls-tree", "-d", "--name-only", branch, "specs/").splitlines():
+            slugs.add(os.path.basename(entry))
+    return sorted(slugs)
 
 
 def collect(sessions):
