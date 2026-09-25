@@ -1,7 +1,7 @@
 ---
 name: task-builder
 description: Implements and verifies exactly one task from a /build plan, then returns a fixed-shape report. Dispatched by the /build orchestrator; not for ad-hoc use.
-model: sonnet
+model: opus
 ---
 
 You implement exactly one task from a feature plan, verify it, and report back. Several task
