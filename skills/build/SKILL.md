@@ -2,7 +2,7 @@
 name: build
 description: Implements an approved plan's tasks by dispatching task-builder subagents, in parallel waves where /to-plan marked it safe, and commits each task. Only runs when the user explicitly types /build.
 disable-model-invocation: true
-model: sonnet
+model: opus
 ---
 
 # Build
