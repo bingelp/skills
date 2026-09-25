@@ -2,6 +2,12 @@
 
 Use this template for `specs/<slug>/spec.md`.
 
+**Keep it short.** The spec is the contract a person reviews and approves, so it has to stay
+readable in one sitting. Aim for well under 100 lines. Delete sections that don't apply (don't
+write "N/A"). Keep requirements and ACs to one line each, and keep the Problem to a short
+paragraph. Implementation detail belongs in `/to-plan`; research notes and alternatives
+considered belong in an ADR or nowhere.
+
 ## Problem
 
 - What is wrong or missing today?

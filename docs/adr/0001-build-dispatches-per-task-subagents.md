@@ -1,3 +1,7 @@
+---
+status: accepted; sequential dispatch superseded by ADR-0003
+---
+
 # `/build` dispatches per-task subagents instead of looping inline
 
 `/build` was the only pipeline step that reused one session across every unit of work, so its context grew ~quadratically with task count. We changed it to a **build orchestrator** that dispatches one disposable **task subagent** per task (via the `Agent` tool, foreground and sequential), bounding the orchestrator's own context to `O(tasks)`.

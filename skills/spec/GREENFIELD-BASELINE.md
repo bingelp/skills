@@ -1,7 +1,7 @@
 # Greenfield Baseline
 
 Use this only when the project is new or technical foundations are not already established.
-Capture this as "Delivery Constraints" in `spec.md` so `/plan` does not need to guess baseline facts.
+Capture this as "Delivery Constraints" in `spec.md` so `/to-plan` does not need to guess baseline facts.
 
 This is intentionally lightweight: record constraints and defaults, not deep architecture.
 
@@ -26,4 +26,4 @@ This is intentionally lightweight: record constraints and defaults, not deep arc
 - Deep implementation design and detailed architecture diagrams.
 - Irreversible technical decisions that need trade-off analysis.
 
-Those belong in `/plan`, with ADRs when the decision meets the ADR test.
+Those belong in `/to-plan`, with ADRs when the decision meets the ADR test.

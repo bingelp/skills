@@ -24,13 +24,9 @@ files — it only reports.
 
 ## Where artifacts live
 
-Every `specs/<slug>/…` path resolves under the repo's **shared git dir**, not the working tree:
-
-```sh
-SPECS="$(git rev-parse --path-format=absolute --git-common-dir)/specs"   # e.g. …/.git/specs
-```
-
-Storing artifacts there keeps them visible across every session and worktree — including the background-isolated steps Claude Code may switch into automatically — while making them impossible to accidentally commit. Outside a git repo, fall back to `./specs`. `tally.py` resolves this location itself, so you never pass it a path.
+`specs/<slug>/` at the repo root, committed on each feature's branch. `tally.py` resolves this
+itself, and it also finds features whose folders exist only on another local branch, so you never
+pass it a path.
 
 ## Process
 
